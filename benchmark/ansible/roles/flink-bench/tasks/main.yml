@@ -3,8 +3,7 @@
   file:
     path: "{{ bench_dir }}"
     state: absent
-  tags:
-    - clean
+  tags: clean
 
 - name: Create the bench dir
   file:
@@ -12,16 +11,16 @@
     state: directory
   tags: deliver
 
-- name: Copy the bench application
-  copy:
-    src: flamestream-benchmark-1.0-SNAPSHOT-uber.jar
-    dest: "{{ bench_dir }}/bench.jar"
-  tags: deliver
-
-- name: Copy the wiki dump
+- name: Copy wiki
   copy:
     src: wiki.xml
     dest: "{{ bench_dir }}/wiki.xml"
+  tags: deliver
+
+- name: Copy the bench application
+  copy:
+    src: flink-benchmark-1.0-SNAPSHOT-uber.jar
+    dest: "{{ bench_dir }}/bench.jar"
   tags: deliver
 
 - name: Copy the configuraion file
@@ -31,11 +30,11 @@
   tags: deliver
 
 - name: Start the flamestream bench
-  shell: java -jar {{ bench_dir }}/bench.jar {{ bench_dir }}/bench.conf > {{ bench_dir }}/flamestream_bench.log
+  shell: java -jar {{ bench_dir }}/bench.jar {{ bench_dir }}/bench.conf > {{ bench_dir }}/flink_bench.log 2>&1
   tags: run
 
 - name: Fetch bench logs
   fetch:
-    src: "{{ bench_dir }}/flamestream_bench.log"
-    dest: flamestream_bench.log
+    src: "{{ bench_dir }}/flink_bench.log"
+    dest: flink.log
   tags: run

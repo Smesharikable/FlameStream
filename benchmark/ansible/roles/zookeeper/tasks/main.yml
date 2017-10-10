@@ -1,9 +1,21 @@
 ---
+- name: Clean the zookeeper dir exists at {{ zookeeper_dir }}
+  file:
+    path: "{{ zookeeper_dir }}"
+    state: absent
+  tags: clean
+
 - name: Ensure the zookeeper dir exists at {{ zookeeper_dir }}
   file:
     path: "{{ zookeeper_dir }}"
     state: directory
   tags: deliver
+
+- name: Clean the tarball dir exists {{ zookeeper_tarball_dir }}
+  file:
+    path: "{{ zookeeper_tarball_dir }}"
+    state: directory
+  tags: clean
 
 - name: Ensure the tarball dir exists {{ zookeeper_tarball_dir }}
   file:
@@ -32,17 +44,13 @@
 
 - name: Stop zookeeper
   shell: "{{ zookeeper_dir }}/bin/zkServer.sh stop"
-  tags:
-    - destroy
-    - bootstrap
+  tags: destroy
 
 - name: Clear the zookeeper data directory at {{ zookeeper_data_dir }}
   file:
     path: "{{ zookeeper_data_dir }}"
     state: absent
-  tags:
-    - bootstrap
-    - destroy
+  tags: destroy
 
 - name: Create the zookeeper data directory at {{ zookeeper_data_dir }}
   file:

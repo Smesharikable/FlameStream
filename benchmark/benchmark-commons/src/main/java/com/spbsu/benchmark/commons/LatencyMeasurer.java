@@ -27,7 +27,7 @@ public class LatencyMeasurer<T> {
     this.delay = warmUpDelay;
   }
 
-  public void start(T key) {
+  public synchronized void start(T key) {
     if (--delay > 0)
       return;
     delay = measurePeriod;
@@ -37,7 +37,7 @@ public class LatencyMeasurer<T> {
     latencies.put(key, new LongSummaryStatistics());
   }
 
-  public void finish(T key) {
+  public synchronized void finish(T key) {
     if (starts.containsKey(key)) {
       final long latency = System.nanoTime() - starts.get(key);
       latencies.computeIfPresent(key, (k, stat) -> {
@@ -49,9 +49,20 @@ public class LatencyMeasurer<T> {
 
   public long[] latencies() {
     latencies.values().forEach(stat ->
-            LOG.info("Latencies distribution for article: {}", stat)
+            LOG.warn("Latencies distribution for article: {}", stat)
     );
-    return latencies.values().stream().map(LongSummaryStatistics::getMax)
+
+    final long[] latenciesDump = latencies.values().stream().map(LongSummaryStatistics::getMax)
             .mapToLong(l -> l).toArray();
+    final StringBuilder stringBuilder = new StringBuilder();
+    for (int i = 0; i < latenciesDump.length; i++) {
+      stringBuilder.append(latenciesDump[i]);
+      if (i != (latenciesDump.length - 1)) {
+        stringBuilder.append(", ");
+      }
+    }
+    LOG.info("Latencies dump: [{}]", stringBuilder.toString());
+
+    return latenciesDump;
   }
 }
