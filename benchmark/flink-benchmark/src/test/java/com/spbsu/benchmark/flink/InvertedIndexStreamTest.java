@@ -21,7 +21,7 @@ import java.util.*;
  * Date: 05.10.2017
  */
 public class InvertedIndexStreamTest {
-  private final Logger LOG = LoggerFactory.getLogger(InvertedIndexStreamTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(InvertedIndexStreamTest.class);
   //dirty code for avoiding serialization
   private static Iterator<WikipediaPage> sourceIterator;
 
@@ -87,8 +87,11 @@ public class InvertedIndexStreamTest {
       //noinspection Duplicates
       while (running) {
         if (sourceIterator.hasNext()) {
-          ctx.collect(sourceIterator.next());
+          final WikipediaPage next = sourceIterator.next();
+          ctx.collect(next);
           ctx.emitWatermark(new Watermark(System.nanoTime()));
+          LOG.warn("Page id: {}", next.id());
+          Thread.sleep(100);
         } else {
           running = false;
           ctx.close();
