@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
@@ -23,18 +22,18 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * Date: 28.09.2017
  */
 public class TestEnvironment implements Environment {
-  private static final long DEFAULT_TEST_WINDOW = MILLISECONDS.toNanos(10);
+  private static final long DEFAULT_TEST_WINDOW = 10;
 
   private final Environment innerEnvironment;
-  private final long window;
+  private final long windowInMillis;
 
   public TestEnvironment(Environment inner) {
     this(inner, DEFAULT_TEST_WINDOW);
   }
 
-  public TestEnvironment(Environment inner, long window) {
+  public TestEnvironment(Environment inner, long windowInMillis) {
     this.innerEnvironment = inner;
-    this.window = window;
+    this.windowInMillis = windowInMillis;
   }
 
   public TheGraph withFusedFronts(Graph graph) {
@@ -45,18 +44,18 @@ public class TestEnvironment implements Environment {
 
   public void deploy(TheGraph theGraph, int tickLengthSeconds, int ticksCount) {
     final Map<HashRange, Integer> workers = rangeMappingForTick();
-    final long tickNanos = SECONDS.toNanos(tickLengthSeconds);
+    final long tickMills = SECONDS.toMillis(tickLengthSeconds);
 
-    long startTs = System.nanoTime();
-    for (int i = 0; i < ticksCount; ++i, startTs += tickNanos) {
+    long startTs = System.currentTimeMillis();
+    for (int i = 0; i < ticksCount; ++i, startTs += tickMills) {
       final TickInfo tickInfo = new TickInfo(
               i,
               startTs,
-              startTs + tickNanos,
+              startTs + tickMills,
               theGraph,
-              workers.values().stream().findAny().orElseThrow(RuntimeException::new),
+              workers.values().stream().min(Integer::compareTo).get(),
               workers,
-              window,
+              windowInMillis,
               i == 0 ? emptySet() : singleton(i - 1L)
       );
       innerEnvironment.deploy(tickInfo);
