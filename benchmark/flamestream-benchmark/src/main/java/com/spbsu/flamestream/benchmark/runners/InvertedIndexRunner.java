@@ -30,12 +30,15 @@ public class InvertedIndexRunner implements EnvironmentRunner {
 
   @Override
   public void run(Environment environment, Config config) {
-    final LatencyMeasurer<Integer> latencyMeasurer = new LatencyMeasurer<>(10, 0);
+    final LatencyMeasurer<Integer> latencyMeasurer = new LatencyMeasurer<>(0, 0);
     final String inputPath = config.hasPath("input-path") ? config.getString("input-path") : null;
+    final int limit = config.hasPath("limit") ? config.getInt("limit") : 250;
+
     final Stream<WikipediaPage> source = (inputPath == null ?
             WikipeadiaInput.dumpStreamFromResources("wikipedia/national_football_teams_dump.xml")
-            : WikipeadiaInput.dumpStreamFromFile(inputPath)
-    ).peek(wikipediaPage -> latencyMeasurer.start(wikipediaPage.id()));
+            : WikipeadiaInput.dumpStreamFromFile(inputPath))
+            .limit(limit)
+            .peek(wikipediaPage -> latencyMeasurer.start(wikipediaPage.id()));
 
     final int tickLengthInSec = config.getInt("tick-length-sec");
     try (TestEnvironment testEnvironment = new TestEnvironment(environment, 1)) {
@@ -55,7 +58,7 @@ public class InvertedIndexRunner implements EnvironmentRunner {
       final int[] pagesCount = {0};
       final int sleepTimeInMs = config.hasPath("rate") ? config.getInt("rate") : 100;
 
-      final Consumer<Object> sink = testEnvironment.randomFrontConsumer(1);
+      final Consumer<Object> sink = testEnvironment.randomFrontConsumer(testEnvironment.availableFronts().size());
       source.forEach(wikipediaPage -> {
         sink.accept(wikipediaPage);
         pagesCount[0]++;
