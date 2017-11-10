@@ -64,7 +64,7 @@ public final class TickRoutesResolver extends LoggingActor {
 
       if (refs.size() == cluster.size() && acker != null) {
         log().info("Collected all refs!");
-        getContext().getParent().tell(new TickRoutes(refs, acker), self());
+        getContext().getParent().tell(new TickRoutes(refs, localFronts, acker), self());
         context().stop(self());
       }
     }).match(ActorIdentity.class, id -> !id.getActorRef().isPresent(), id -> {

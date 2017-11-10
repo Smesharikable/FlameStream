@@ -1,6 +1,7 @@
 package com.spbsu.flamestream.runtime.source;
 
 import akka.actor.ActorRef;
+import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
 import com.spbsu.flamestream.core.TickInfo;
 import com.spbsu.flamestream.core.data.DataItem;
@@ -12,6 +13,8 @@ import com.spbsu.flamestream.runtime.source.api.Heartbeat;
 import com.spbsu.flamestream.runtime.source.api.PleaseWait;
 import com.spbsu.flamestream.runtime.tick.TickRoutes;
 
+import java.util.Set;
+
 /**
  * User: Artem
  * Date: 10.11.2017
@@ -19,15 +22,26 @@ import com.spbsu.flamestream.runtime.tick.TickRoutes;
 public class SourceActor extends AtomicActor {
   private final Source source;
   private final TickInfo tickInfo;
+  private final Set<ActorRef> localFronts;
+  private final SourceHandle sourceHandle;
 
-  private ActorRef frontRef;
-  private SourceHandle sourceHandle;
-
-  public SourceActor(Source source, TickInfo tickInfo, TickRoutes tickRoutes) {
+  private SourceActor(Source source, TickInfo tickInfo, TickRoutes tickRoutes) {
     super(source, tickInfo, tickRoutes);
     this.source = source;
     this.tickInfo = tickInfo;
+
+    localFronts = tickRoutes.localFronts();
     sourceHandle = new SourceHandleImpl(tickInfo, tickRoutes, context());
+  }
+
+  public static Props props(Source source, TickInfo tickInfo, TickRoutes tickRoutes) {
+    return Props.create(SourceActor.class, source, tickInfo, tickRoutes);
+  }
+
+  @Override
+  public void preStart() throws Exception {
+
+    super.preStart();
   }
 
   @Override
