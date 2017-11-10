@@ -7,7 +7,9 @@ import com.spbsu.flamestream.core.data.DataItem;
 import com.spbsu.flamestream.core.graph.source.Source;
 import com.spbsu.flamestream.core.graph.source.SourceHandle;
 import com.spbsu.flamestream.runtime.range.atomic.AtomicActor;
+import com.spbsu.flamestream.runtime.source.api.Accepted;
 import com.spbsu.flamestream.runtime.source.api.Heartbeat;
+import com.spbsu.flamestream.runtime.source.api.PleaseWait;
 import com.spbsu.flamestream.runtime.tick.TickRoutes;
 
 /**
@@ -17,7 +19,6 @@ import com.spbsu.flamestream.runtime.tick.TickRoutes;
 public class SourceActor extends AtomicActor {
   private final Source source;
   private final TickInfo tickInfo;
-  private final TickRoutes tickRoutes;
 
   private ActorRef frontRef;
   private SourceHandle sourceHandle;
@@ -26,7 +27,7 @@ public class SourceActor extends AtomicActor {
     super(source, tickInfo, tickRoutes);
     this.source = source;
     this.tickInfo = tickInfo;
-    this.tickRoutes = tickRoutes;
+    sourceHandle = new SourceHandleImpl(tickInfo, tickRoutes, context());
   }
 
   @Override
@@ -35,16 +36,20 @@ public class SourceActor extends AtomicActor {
     return super.createReceive().orElse(
             ReceiveBuilder.create()
                     .match(DataItem.class, dataItem -> {
-                      if (sourceHandle == null) {
-                        sourceHandle = new SourceHandleImpl(tickInfo, tickRoutes, context());
+                      final long time = dataItem.meta().globalTime().time();
+                      if (time >= tickInfo.startTs() && time < tickInfo.stopTs()) {
+                        source.onNext(dataItem, sourceHandle);
+                        sender().tell(new Accepted(), self());
+                      } else {
+                        // TODO: 10.11.2017 specify duration
+                        sender().tell(new PleaseWait(1), self());
                       }
-                      source.onNext(dataItem, sourceHandle);
                     })
                     .match(Heartbeat.class, heartbeat -> {
-                      if (sourceHandle == null) {
-                        sourceHandle = new SourceHandleImpl(tickInfo, tickRoutes, context());
+                      final long time = heartbeat.time().time();
+                      if (time >= tickInfo.startTs() && time < tickInfo.stopTs()) {
+                        source.onHeartbeat(heartbeat.time(), sourceHandle);
                       }
-                      source.onHeartbeat(heartbeat.time(), sourceHandle);
                     })
                     .build()
     );
