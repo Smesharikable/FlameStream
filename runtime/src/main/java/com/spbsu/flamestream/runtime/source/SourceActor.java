@@ -10,6 +10,7 @@ import com.spbsu.flamestream.core.graph.source.SourceHandle;
 import com.spbsu.flamestream.runtime.range.atomic.AtomicActor;
 import com.spbsu.flamestream.runtime.source.api.Accepted;
 import com.spbsu.flamestream.runtime.source.api.Heartbeat;
+import com.spbsu.flamestream.runtime.source.api.NewHole;
 import com.spbsu.flamestream.runtime.source.api.PleaseWait;
 import com.spbsu.flamestream.runtime.tick.TickRoutes;
 
@@ -40,7 +41,7 @@ public class SourceActor extends AtomicActor {
 
   @Override
   public void preStart() throws Exception {
-
+    localFronts.forEach(actorRef -> actorRef.tell(new NewHole(self(), tickInfo.startTs()), self()));
     super.preStart();
   }
 
@@ -51,13 +52,14 @@ public class SourceActor extends AtomicActor {
             ReceiveBuilder.create()
                     .match(DataItem.class, dataItem -> {
                       final long time = dataItem.meta().globalTime().time();
-                      if (time >= tickInfo.startTs() && time < tickInfo.stopTs()) {
-                        source.onNext(dataItem, sourceHandle);
-                        sender().tell(new Accepted(dataItem), self());
-                      } else {
-                        // TODO: 10.11.2017 specify duration
-                        sender().tell(new PleaseWait(1), self());
+                      if (time < tickInfo.startTs()) {
+                        throw new IllegalArgumentException("DataItems ts cannot be less than tick start");
+                      } else if (time >= tickInfo.stopTs()) {
+                        sender().tell(new PleaseWait(42), self()); // TODO: 10.11.2017 think about magic number
                       }
+
+                      source.onNext(dataItem, sourceHandle);
+                      sender().tell(new Accepted(dataItem), self());
                     })
                     .match(Heartbeat.class, heartbeat -> {
                       final long time = heartbeat.time().time();
