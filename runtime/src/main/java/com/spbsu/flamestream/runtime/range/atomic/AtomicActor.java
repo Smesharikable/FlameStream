@@ -2,6 +2,7 @@ package com.spbsu.flamestream.runtime.range.atomic;
 
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
+import com.spbsu.flamestream.core.TickInfo;
 import com.spbsu.flamestream.core.data.DataItem;
 import com.spbsu.flamestream.core.graph.AtomicGraph;
 import com.spbsu.flamestream.core.graph.AtomicHandle;
@@ -10,7 +11,6 @@ import com.spbsu.flamestream.runtime.ack.messages.MinTimeUpdate;
 import com.spbsu.flamestream.runtime.actor.LoggingActor;
 import com.spbsu.flamestream.runtime.range.AddressedItem;
 import com.spbsu.flamestream.runtime.range.AtomicCommitDone;
-import com.spbsu.flamestream.core.TickInfo;
 import com.spbsu.flamestream.runtime.tick.TickRoutes;
 
 public class AtomicActor extends LoggingActor {
@@ -67,7 +67,7 @@ public class AtomicActor extends LoggingActor {
     stat.recordOnAtomicMessage(stop - start);
   }
 
-  private void onMinTimeUpdate(MinTimeUpdate message) {
+  protected void onMinTimeUpdate(MinTimeUpdate message) {
     final long start = System.nanoTime();
 
     atomic.onMinGTimeUpdate(message.minTime(), handle);

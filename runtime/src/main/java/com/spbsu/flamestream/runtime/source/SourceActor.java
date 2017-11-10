@@ -1,20 +1,16 @@
 package com.spbsu.flamestream.runtime.source;
 
-import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
 import com.spbsu.flamestream.core.TickInfo;
 import com.spbsu.flamestream.core.data.DataItem;
 import com.spbsu.flamestream.core.graph.source.Source;
-import com.spbsu.flamestream.core.graph.source.SourceHandle;
+import com.spbsu.flamestream.runtime.ack.messages.MinTimeUpdate;
 import com.spbsu.flamestream.runtime.range.atomic.AtomicActor;
-import com.spbsu.flamestream.runtime.source.api.Accepted;
 import com.spbsu.flamestream.runtime.source.api.Heartbeat;
 import com.spbsu.flamestream.runtime.source.api.NewHole;
 import com.spbsu.flamestream.runtime.source.api.PleaseWait;
 import com.spbsu.flamestream.runtime.tick.TickRoutes;
-
-import java.util.Set;
 
 /**
  * User: Artem
@@ -23,15 +19,12 @@ import java.util.Set;
 public class SourceActor extends AtomicActor {
   private final Source source;
   private final TickInfo tickInfo;
-  private final Set<ActorRef> localFronts;
-  private final SourceHandle sourceHandle;
+  private final SourceHandleImpl sourceHandle;
 
   private SourceActor(Source source, TickInfo tickInfo, TickRoutes tickRoutes) {
     super(source, tickInfo, tickRoutes);
     this.source = source;
     this.tickInfo = tickInfo;
-
-    localFronts = tickRoutes.localFronts();
     sourceHandle = new SourceHandleImpl(tickInfo, tickRoutes, context());
   }
 
@@ -41,7 +34,7 @@ public class SourceActor extends AtomicActor {
 
   @Override
   public void preStart() throws Exception {
-    localFronts.forEach(actorRef -> actorRef.tell(new NewHole(self(), tickInfo.startTs()), self()));
+    context().actorSelection("/user/fronts/*").tell(new NewHole(self(), tickInfo.startTs()), self());
     super.preStart();
   }
 
@@ -53,13 +46,12 @@ public class SourceActor extends AtomicActor {
                     .match(DataItem.class, dataItem -> {
                       final long time = dataItem.meta().globalTime().time();
                       if (time < tickInfo.startTs()) {
-                        throw new IllegalArgumentException("DataItems ts cannot be less than tick start");
+                        throw new IllegalStateException("DataItems ts cannot be less than tick start");
                       } else if (time >= tickInfo.stopTs()) {
                         sender().tell(new PleaseWait(42), self()); // TODO: 10.11.2017 think about magic number
                       }
-
+                      sourceHandle.putRef(dataItem.meta().globalTime().front(), sender());
                       source.onNext(dataItem, sourceHandle);
-                      sender().tell(new Accepted(dataItem), self());
                     })
                     .match(Heartbeat.class, heartbeat -> {
                       final long time = heartbeat.time().time();
@@ -71,4 +63,9 @@ public class SourceActor extends AtomicActor {
     );
   }
 
+  @Override
+  protected void onMinTimeUpdate(MinTimeUpdate message) {
+    source.onMinGTimeUpdate(message.minTime(), sourceHandle);
+    super.onMinTimeUpdate(message);
+  }
 }

@@ -9,4 +9,6 @@ import com.spbsu.flamestream.core.graph.AtomicHandle;
  */
 public interface SourceHandle extends AtomicHandle {
   void heartbeat(GlobalTime time);
+
+  void accept(GlobalTime globalTime);
 }
