@@ -39,7 +39,7 @@ public class SourceActor extends AtomicActor {
                       final long time = dataItem.meta().globalTime().time();
                       if (time >= tickInfo.startTs() && time < tickInfo.stopTs()) {
                         source.onNext(dataItem, sourceHandle);
-                        sender().tell(new Accepted(), self());
+                        sender().tell(new Accepted(dataItem), self());
                       } else {
                         // TODO: 10.11.2017 specify duration
                         sender().tell(new PleaseWait(1), self());
