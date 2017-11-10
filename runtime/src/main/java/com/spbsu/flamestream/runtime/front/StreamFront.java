@@ -8,29 +8,22 @@ import com.spbsu.flamestream.core.data.PayloadDataItem;
 import com.spbsu.flamestream.core.data.meta.GlobalTime;
 import com.spbsu.flamestream.core.data.meta.Meta;
 import com.spbsu.flamestream.runtime.actor.LoggingActor;
-import com.spbsu.flamestream.runtime.source.Heartbeat;
-import com.spbsu.flamestream.runtime.source.api.Cancel;
-import com.spbsu.flamestream.runtime.source.api.NewHole;
-import com.spbsu.flamestream.runtime.source.api.Replay;
-import com.spbsu.flamestream.runtime.source.api.SlowDownBro;
+import com.spbsu.flamestream.runtime.source.api.*;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
-import static java.util.Collections.synchronizedList;
 import static java.util.Collections.synchronizedSet;
 
 public final class StreamFront<T> extends LoggingActor {
   private final int frontId = 1;
   private final Map<ActorRef> holes = synchronizedSet(new HashSet<>());
+
 
   private final NavigableSet<DataItem<T>> history = new ConcurrentSkipListSet<>(Comparator.comparing(DataItem::meta));
 

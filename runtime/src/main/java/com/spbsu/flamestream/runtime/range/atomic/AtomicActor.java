@@ -13,12 +13,12 @@ import com.spbsu.flamestream.runtime.range.AtomicCommitDone;
 import com.spbsu.flamestream.core.TickInfo;
 import com.spbsu.flamestream.runtime.tick.TickRoutes;
 
-public final class AtomicActor extends LoggingActor {
+public class AtomicActor extends LoggingActor {
   private final AtomicActorStatistics stat = new AtomicActorStatistics();
   private final AtomicGraph atomic;
   private final AtomicHandle handle;
 
-  private AtomicActor(AtomicGraph atomic, TickInfo tickInfo, TickRoutes tickRoutes) {
+  public AtomicActor(AtomicGraph atomic, TickInfo tickInfo, TickRoutes tickRoutes) {
     this.atomic = atomic;
     this.handle = new AtomicHandleImpl(tickInfo, tickRoutes, context());
   }

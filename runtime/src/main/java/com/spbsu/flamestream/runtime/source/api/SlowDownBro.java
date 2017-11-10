@@ -1,6 +1,7 @@
 package com.spbsu.flamestream.runtime.source.api;
 
 import akka.actor.ActorRef;
+import com.spbsu.flamestream.runtime.api.Out;
 
 @Out
 public final class SlowDownBro {

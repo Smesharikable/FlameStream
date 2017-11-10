@@ -1,11 +1,10 @@
-package com.spbsu.flamestream.runtime.source;
+package com.spbsu.flamestream.core.graph.source;
 
 import com.spbsu.flamestream.core.data.DataItem;
+import com.spbsu.flamestream.core.data.meta.GlobalTime;
 import com.spbsu.flamestream.core.graph.AbstractAtomicGraph;
-import com.spbsu.flamestream.core.graph.AtomicHandle;
 import com.spbsu.flamestream.core.graph.InPort;
 import com.spbsu.flamestream.core.graph.OutPort;
-import scala.concurrent.java8.FuturesConvertersImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +22,11 @@ public final class Source extends AbstractAtomicGraph {
     return Collections.singletonList(outPort);
   }
 
-  public long onNext(DataItem<?> item, AtomicHandle handle) {
+  public void onNext(DataItem<?> item, SourceHandle handle) {
     handle.push(outPort, item);
+  }
+
+  public void onHeartbeat(GlobalTime globalTime, SourceHandle handle) {
+    handle.heartbeat(globalTime);
   }
 }
