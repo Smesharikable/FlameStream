@@ -5,6 +5,8 @@ import com.spbsu.flamestream.core.data.meta.GlobalTime;
 import com.spbsu.flamestream.core.stat.Statistics;
 
 public interface AtomicHandle {
+  void heartbeat(GlobalTime time);
+
   void push(OutPort out, DataItem<?> result);
 
   void ack(long xor, GlobalTime globalTime);

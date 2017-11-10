@@ -15,7 +15,7 @@ import com.spbsu.flamestream.runtime.configuration.TickInfoSerializer;
 import com.spbsu.flamestream.runtime.environment.CollectingActor;
 import com.spbsu.flamestream.runtime.environment.Environment;
 import com.spbsu.flamestream.runtime.raw.SingleRawData;
-import com.spbsu.flamestream.runtime.tick.TickInfo;
+import com.spbsu.flamestream.core.TickInfo;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.hadoop.util.ZKUtil;

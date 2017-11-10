@@ -4,8 +4,8 @@ import com.spbsu.flamestream.core.graph.AtomicGraph;
 import com.spbsu.flamestream.core.graph.Graph;
 import com.spbsu.flamestream.core.graph.InPort;
 import com.spbsu.flamestream.runtime.environment.Environment;
-import com.spbsu.flamestream.runtime.range.HashRange;
-import com.spbsu.flamestream.runtime.tick.TickInfo;
+import com.spbsu.flamestream.core.HashRange;
+import com.spbsu.flamestream.core.TickInfo;
 
 import java.util.HashMap;
 import java.util.List;

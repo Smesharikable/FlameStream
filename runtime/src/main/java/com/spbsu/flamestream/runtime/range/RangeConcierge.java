@@ -3,6 +3,7 @@ package com.spbsu.flamestream.runtime.range;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
+import com.spbsu.flamestream.core.HashRange;
 import com.spbsu.flamestream.core.graph.AtomicGraph;
 import com.spbsu.flamestream.core.graph.InPort;
 import com.spbsu.flamestream.runtime.ack.messages.Commit;
@@ -11,7 +12,7 @@ import com.spbsu.flamestream.runtime.ack.messages.RangeCommitDone;
 import com.spbsu.flamestream.runtime.actor.LoggingActor;
 import com.spbsu.flamestream.runtime.range.atomic.AtomicActor;
 import com.spbsu.flamestream.runtime.tick.StartTick;
-import com.spbsu.flamestream.runtime.tick.TickInfo;
+import com.spbsu.flamestream.core.TickInfo;
 import com.spbsu.flamestream.runtime.tick.TickRoutes;
 
 import java.util.Collection;
@@ -54,7 +55,7 @@ public final class RangeConcierge extends LoggingActor {
   public Receive createReceive() {
     return ReceiveBuilder.create().match(StartTick.class, startTick -> {
       tickRoutes = startTick.tickRoutingInfo();
-      initializedGraph = initializedAtomics(tickInfo.graph().graph().subGraphs(), tickRoutes);
+      initializedGraph = initializedAtomics(tickInfo.graph().subGraphs(), tickRoutes);
       routingTable = RangeConcierge.withFlattenedKey(initializedGraph);
 
       unstashAll();

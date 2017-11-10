@@ -7,7 +7,7 @@ import com.spbsu.flamestream.runtime.DumbInetSocketAddress;
 import com.spbsu.flamestream.runtime.application.WorkerApplication;
 import com.spbsu.flamestream.runtime.environment.Environment;
 import com.spbsu.flamestream.runtime.environment.remote.RemoteEnvironment;
-import com.spbsu.flamestream.runtime.tick.TickInfo;
+import com.spbsu.flamestream.core.TickInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.util.ZKUtil;
 import org.apache.zookeeper.CreateMode;

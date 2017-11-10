@@ -7,9 +7,9 @@ import com.spbsu.flamestream.core.data.meta.GlobalTime;
 import com.spbsu.flamestream.runtime.ack.impl.ArrayAckTable;
 import com.spbsu.flamestream.runtime.ack.messages.*;
 import com.spbsu.flamestream.runtime.actor.LoggingActor;
-import com.spbsu.flamestream.runtime.range.HashRange;
+import com.spbsu.flamestream.core.HashRange;
 import com.spbsu.flamestream.runtime.tick.StartTick;
-import com.spbsu.flamestream.runtime.tick.TickInfo;
+import com.spbsu.flamestream.core.TickInfo;
 import com.spbsu.flamestream.runtime.tick.TickRoutes;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -31,13 +31,9 @@ public final class AckActor extends LoggingActor {
   private TickRoutes tickRoutes = null;
 
   private AckActor(TickInfo tickInfo, ActorRef tickWatcher) {
+    // TODO: 11/10/17 front? How
     this.tickInfo = tickInfo;
     this.tickWatcher = tickWatcher;
-
-    tickInfo.graph()
-            .frontBindings()
-            .keySet()
-            .forEach(i -> tables.put(i, new ArrayAckTable(tickInfo.startTs(), tickInfo.stopTs(), tickInfo.window())));
   }
 
   public static Props props(TickInfo tickInfo, ActorRef tickWatcher) {
@@ -140,5 +136,4 @@ public final class AckActor extends LoggingActor {
     if (newTime.compareTo(currentMin) < 0) {
       throw new IllegalStateException("Not monotonic acks. Fixme");
     }
-  }
-}
+  } }

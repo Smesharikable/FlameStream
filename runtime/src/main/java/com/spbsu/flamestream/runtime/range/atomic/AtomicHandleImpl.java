@@ -13,7 +13,7 @@ import com.spbsu.flamestream.core.stat.Statistics;
 import com.spbsu.flamestream.runtime.ack.messages.Ack;
 import com.spbsu.flamestream.runtime.range.AddressedItem;
 import com.spbsu.flamestream.runtime.tick.HashMapping;
-import com.spbsu.flamestream.runtime.tick.TickInfo;
+import com.spbsu.flamestream.core.TickInfo;
 import com.spbsu.flamestream.runtime.tick.TickRoutes;
 
 import java.util.function.ToIntFunction;
@@ -35,8 +35,13 @@ public final class AtomicHandleImpl implements AtomicHandle {
   }
 
   @Override
+  public TickInfo tickInfo() {
+    return tickInfo;
+  }
+
+  @Override
   public void push(OutPort out, DataItem<?> result) {
-    final InPort destination = tickInfo.graph().graph().downstreams().get(out);
+    final InPort destination = tickInfo.graph().downstreams().get(out);
     if (destination == null) {
       throw new RoutingException("Unable to find port for " + out);
     }

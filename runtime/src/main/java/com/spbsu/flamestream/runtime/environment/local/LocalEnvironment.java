@@ -16,7 +16,7 @@ import com.spbsu.flamestream.runtime.front.FrontActor;
 import com.spbsu.flamestream.runtime.raw.SingleRawData;
 import com.spbsu.flamestream.runtime.tick.TickCommitDone;
 import com.spbsu.flamestream.runtime.tick.TickConcierge;
-import com.spbsu.flamestream.runtime.tick.TickInfo;
+import com.spbsu.flamestream.core.TickInfo;
 import com.typesafe.config.ConfigFactory;
 import org.apache.commons.io.FileUtils;
 import scala.concurrent.Await;

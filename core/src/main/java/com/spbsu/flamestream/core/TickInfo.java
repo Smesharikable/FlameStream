@@ -1,7 +1,7 @@
-package com.spbsu.flamestream.runtime.tick;
+package com.spbsu.flamestream.core;
 
-import com.spbsu.flamestream.runtime.TheGraph;
-import com.spbsu.flamestream.runtime.range.HashRange;
+import com.spbsu.flamestream.core.graph.AtomicGraph;
+import com.spbsu.flamestream.core.graph.ComposedGraph;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +14,7 @@ import static java.util.Collections.unmodifiableSet;
 public final class TickInfo {
   private final long id;
 
-  private final TheGraph graph;
+  private final ComposedGraph<AtomicGraph> graph;
 
   private final Map<HashRange, Integer> hashMapping;
 
@@ -31,7 +31,7 @@ public final class TickInfo {
   public TickInfo(long id,
           long startTs,
           long stopTs,
-          TheGraph graph,
+          ComposedGraph<AtomicGraph> graph,
           int ackerLocation,
           Map<HashRange, Integer> hashMapping,
           long window,
@@ -58,7 +58,7 @@ public final class TickInfo {
     return stopTs;
   }
 
-  public TheGraph graph() {
+  public ComposedGraph<AtomicGraph> graph() {
     return graph;
   }
 

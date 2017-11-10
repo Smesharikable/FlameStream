@@ -10,7 +10,7 @@ import com.spbsu.flamestream.runtime.ack.messages.MinTimeUpdate;
 import com.spbsu.flamestream.runtime.actor.LoggingActor;
 import com.spbsu.flamestream.runtime.range.AddressedItem;
 import com.spbsu.flamestream.runtime.range.AtomicCommitDone;
-import com.spbsu.flamestream.runtime.tick.TickInfo;
+import com.spbsu.flamestream.core.TickInfo;
 import com.spbsu.flamestream.runtime.tick.TickRoutes;
 
 public final class AtomicActor extends LoggingActor {

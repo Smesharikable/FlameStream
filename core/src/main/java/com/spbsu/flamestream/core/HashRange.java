@@ -1,4 +1,4 @@
-package com.spbsu.flamestream.runtime.range;
+package com.spbsu.flamestream.core;
 
 import java.util.Objects;
 
