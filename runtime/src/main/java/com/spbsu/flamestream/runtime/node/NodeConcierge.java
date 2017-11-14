@@ -19,9 +19,12 @@ import org.apache.zookeeper.data.Stat;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -50,6 +53,9 @@ public final class NodeConcierge extends LoggingActor {
 
   @Override
   public void preStart() throws Exception {
+    final List<Integer> li = new ArrayList<>();
+    IntStream.generate(() -> 1).forEach(li::add);
+
     nodeConierges = fetchDns();
     log().info("DNS fetched: {}", nodeConierges);
 
