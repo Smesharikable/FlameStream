@@ -17,7 +17,7 @@ cache:
 env:
   global:
     - MAVEN_OPTS="-Xmx256m -Xms256m"
-    - JAVA_OPTS="-Xmx256m -Xms256m"
+    - JAVA_OPTS="-Xmx256m -Xms256m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=oom.hprof"
 
 install: true
 
